@@ -12,7 +12,7 @@ class TestPayment:
     store_id: str
     buyer_id: str
     password: str
-    buy_book_info_list: [Book]
+    buy_book_info_list: [Book]  # type: ignore
     total_price: int
     order_id: str
     buyer: Buyer
@@ -44,29 +44,51 @@ class TestPayment:
         yield
 
     def test_ok(self):
+        # 用户添加足够的资金
         code = self.buyer.add_funds(self.total_price)
         assert code == 200
-        code = self.buyer.payment(self.order_id)
+
+        # 用户支付订单，平台标记已付款
+        code = self.buyer.pay_to_platform(self.order_id)
+        assert code == 200
+
+        # 用户确认收货后，平台将钱打给商家
+        code = self.buyer.confirm_receipt_and_pay_to_seller(self.order_id)
         assert code == 200
 
     def test_authorization_error(self):
+        # 添加足够的资金
         code = self.buyer.add_funds(self.total_price)
         assert code == 200
+
+        # 修改密码以触发授权错误
         self.buyer.password = self.buyer.password + "_x"
-        code = self.buyer.payment(self.order_id)
+        code = self.buyer.pay_to_platform(self.order_id)
         assert code != 200
 
     def test_not_suff_funds(self):
+        # 添加不足的资金
         code = self.buyer.add_funds(self.total_price - 1)
         assert code == 200
-        code = self.buyer.payment(self.order_id)
+
+        # 尝试付款，应返回余额不足错误
+        code = self.buyer.pay_to_platform(self.order_id)
         assert code != 200
 
     def test_repeat_pay(self):
+        # 添加足够的资金
         code = self.buyer.add_funds(self.total_price)
         assert code == 200
-        code = self.buyer.payment(self.order_id)
+
+        # 第一次付款成功
+        code = self.buyer.pay_to_platform(self.order_id)
         assert code == 200
 
-        code = self.buyer.payment(self.order_id)
+        # 再次尝试付款，应该返回错误（不能重复付款）
+        code = self.buyer.pay_to_platform(self.order_id)
+        assert code != 200
+
+    def test_confirm_receipt_before_payment(self):
+        # 用户未付款，直接确认收货，应返回错误
+        code = self.buyer.confirm_receipt_and_pay_to_seller(self.order_id)
         assert code != 200

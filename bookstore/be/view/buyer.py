@@ -28,7 +28,7 @@ def pay_to_platform():
     password = request.json.get("password")
     order_id = request.json.get("order_id")
     b = Buyer()
-    code, message = b.pay_order(user_id, password, order_id)
+    code, message = b.pay_to_platform(user_id, password, order_id)
     return jsonify({"message": message}), code
 
 @bp_buyer.route("/confirm_receipt_and_pay_toseller", methods=["POST"])
@@ -37,7 +37,7 @@ def confirm_receipt_and_pay_toseller():
     password = request.json.get("password")
     order_id = request.json.get("order_id")
     b = Buyer()
-    code, message = b.confirm_receipt_and_pay_toseller(user_id, password, order_id)
+    code, message = b.confirm_receipt_and_pay_to_seller(user_id, password, order_id)
     return jsonify({"message": message}), code
 
 @bp_buyer.route("/add_funds", methods=["POST"])
