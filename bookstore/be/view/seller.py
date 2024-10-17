@@ -30,6 +30,14 @@ def seller_add_book():
 
     return jsonify({"message": message}), code
 
+@bp_seller.route("/ship", methods=["POST"])
+def ship():
+    user_id: str = request.json.get("user_id")
+    order_id: str = request.json.get("order_id")
+    order_id: str = request.json.get("order_id")
+    s = seller.Seller()
+    code, message = s.ship(user_id, order_id,order_id)
+    return jsonify({"message": message}), code
 
 @bp_seller.route("/add_stock_level", methods=["POST"])
 def add_stock_level():
