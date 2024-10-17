@@ -1,37 +1,28 @@
-from be.model import store
-
+from pymongo import MongoClient
 
 class DBConn:
     def __init__(self):
-        self.conn = store.get_db_conn()
+        # 连接MongoDB
+        self.client = MongoClient("mongodb://localhost:27017/")
+        self.db = self.client["bookstore"]  # 使用bookstore数据库
 
     def user_id_exist(self, user_id):
-        cursor = self.conn.execute(
-            "SELECT user_id FROM user WHERE user_id = ?;", (user_id,)
-        )
-        row = cursor.fetchone()
-        if row is None:
+        # 查询user集合中是否存在给定user_id
+        user = self.db["user"].find_one({"user_id": user_id})
+        if user is None:
             return False
-        else:
-            return True
+        return True
 
     def book_id_exist(self, store_id, book_id):
-        cursor = self.conn.execute(
-            "SELECT book_id FROM store WHERE store_id = ? AND book_id = ?;",
-            (store_id, book_id),
-        )
-        row = cursor.fetchone()
-        if row is None:
+        # 查询store集合中是否存在对应的store_id和book_id
+        store = self.db["store"].find_one({"store_id": store_id, "book_id": book_id})
+        if store is None:
             return False
-        else:
-            return True
+        return True
 
     def store_id_exist(self, store_id):
-        cursor = self.conn.execute(
-            "SELECT store_id FROM user_store WHERE store_id = ?;", (store_id,)
-        )
-        row = cursor.fetchone()
-        if row is None:
+        # 查询user_store集合中是否存在给定store_id
+        user_store = self.db["user_store"].find_one({"store_id": store_id})
+        if user_store is None:
             return False
-        else:
-            return True
+        return True
