@@ -78,7 +78,7 @@ class User(DBConn):
             return error.error_exist_user_id(user_id)
         return 200, "ok"
 
-    def check_token(self, user_id: str, token: str) -> (int, str):
+    def check_token(self, user_id: str, token: str) -> (int, str): # type: ignore
         user_doc = self.db.user.find_one({"user_id": user_id})
         if user_doc is None:
             return error.error_authorization_fail()
@@ -87,7 +87,7 @@ class User(DBConn):
             return error.error_authorization_fail()
         return 200, "ok"
 
-    def check_password(self, user_id: str, password: str) -> (int, str):
+    def check_password(self, user_id: str, password: str) -> (int, str): # type: ignore
         user_doc = self.db.user.find_one({"user_id": user_id})
         if user_doc is None:
             return error.error_authorization_fail()
@@ -97,7 +97,7 @@ class User(DBConn):
 
         return 200, "ok"
 
-    def login(self, user_id: str, password: str, terminal: str) -> (int, str, str):
+    def login(self, user_id: str, password: str, terminal: str) -> (int, str, str): # type: ignore
         token = ""
         try:
             code, message = self.check_password(user_id, password)
@@ -134,7 +134,7 @@ class User(DBConn):
             return 528, "{}".format(str(e))
         return 200, "ok"
 
-    def unregister(self, user_id: str, password: str) -> (int, str):
+    def unregister(self, user_id: str, password: str) -> (int, str): # type: ignore
         try:
             code, message = self.check_password(user_id, password)
             if code != 200:
