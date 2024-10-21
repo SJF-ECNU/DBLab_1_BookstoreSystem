@@ -10,7 +10,7 @@ bp_buyer = Blueprint("buyer", __name__, url_prefix="/buyer")
 def new_order():
     user_id: str = request.json.get("user_id")
     store_id: str = request.json.get("store_id")
-    books: [] = request.json.get("books")
+    books: [] = request.json.get("books") # type: ignore
     id_and_count = []
     for book in books:
         book_id = book.get("id")
@@ -22,15 +22,23 @@ def new_order():
     return jsonify({"message": message, "order_id": order_id}), code
 
 
-@bp_buyer.route("/payment", methods=["POST"])
-def payment():
-    user_id: str = request.json.get("user_id")
-    order_id: str = request.json.get("order_id")
-    password: str = request.json.get("password")
+@bp_buyer.route("/pay_to_platform", methods=["POST"])
+def pay_to_platform():
+    user_id = request.json.get("user_id")
+    password = request.json.get("password")
+    order_id = request.json.get("order_id")
     b = Buyer()
-    code, message = b.payment(user_id, password, order_id)
+    code, message = b.pay_to_platform(user_id, password, order_id)
     return jsonify({"message": message}), code
 
+@bp_buyer.route("/confirm_receipt_and_pay_toseller", methods=["POST"])
+def confirm_receipt_and_pay_toseller():
+    user_id = request.json.get("user_id")
+    password = request.json.get("password")
+    order_id = request.json.get("order_id")
+    b = Buyer()
+    code, message = b.confirm_receipt_and_pay_to_seller(user_id, password, order_id)
+    return jsonify({"message": message}), code
 
 @bp_buyer.route("/add_funds", methods=["POST"])
 def add_funds():

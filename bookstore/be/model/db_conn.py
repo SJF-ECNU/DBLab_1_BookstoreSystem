@@ -26,3 +26,19 @@ class DBConn:
         if user_store is None:
             return False
         return True
+    
+    def order_id_exist(self, order_id):
+        # 查询order集合中是否存在给定order_id
+        order = self.db["new_order"].find_one({"order_id": order_id})
+        if order is None:
+            return False
+        return True
+    
+    def order_is_paid(self,order_id):
+        # 查询order是否被支付
+        order = self.db["new_order"].find_one({"order_id": order_id})
+        if order is None:
+            return False
+        if order['is_paid']==False:
+            return False
+        return True

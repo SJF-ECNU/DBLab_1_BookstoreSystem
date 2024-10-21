@@ -26,7 +26,7 @@ class Payment:
         self.order_id = order_id
 
     def run(self) -> bool:
-        code = self.buyer.payment(self.order_id)
+        code = self.buyer.pay_to_platform(self.order_id)
         return code == 200
 
 

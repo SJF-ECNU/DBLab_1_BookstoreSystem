@@ -38,7 +38,11 @@ class Seller(db_conn.DBConn):
         return 200, "ok"
 
     def add_stock_level(
-        self, user_id: str, store_id: str, book_id: str, add_stock_level: int
+        self, 
+        user_id: str, 
+        store_id: str, 
+        book_id: str, 
+        add_stock_level: int
     ):
         try:
             # 检查用户、商店和书籍是否存在
@@ -58,7 +62,7 @@ class Seller(db_conn.DBConn):
             return 530, "{}".format(str(e))
         return 200, "ok"
 
-    def create_store(self, user_id: str, store_id: str) -> (int, str):
+    def create_store(self, user_id: str, store_id: str) -> (int, str): # type: ignore
         try:
             # 检查用户是否存在
             if not self.user_id_exist(user_id):
@@ -75,3 +79,52 @@ class Seller(db_conn.DBConn):
         except Exception as e:
             return 530, "{}".format(str(e))
         return 200, "ok"
+
+    def ship(
+            self,
+            user_id: str,
+            store_id: str,
+            order_id: str,
+            ):
+        try:
+            # 检查用户是否存在
+            if not self.user_id_exist(user_id):
+                return error.error_non_exist_user_id(user_id)
+            # 检查商店是否存在
+            if not self.store_id_exist(store_id):
+                return error.error_non_exist_store_id(store_id)
+            # 检查订单是否存在
+            if not self.order_id_exist(order_id):
+                return error.error_invalid_order_id(order_id)
+            # 检查订单是否已经支付
+            if not self.order_is_paid(order_id):
+                return error.error_not_be_paid(order_id)
+            # 更新订单状态
+            self.db["new_order"].update_one(
+                {"order_id": order_id, "store_id": store_id},
+                {"$set": {"is_shipped": True}}
+            )
+        
+        except Exception as e:
+            return 520, "{}".format(str(e))
+        return 200, "ok"
+
+    def query_store_orders(self, user_id: str) -> (int, str, list): # type: ignore
+        try:
+            # 检查用户是否存在
+            if not self.user_id_exist(user_id):
+                return error.error_non_exist_user_id(user_id)
+
+            # 查找用户的店铺
+            user_store = self.db.user_store.find_one({"user_id": user_id})
+            if user_store is None:
+                return error.error_no_store_found(user_id)
+
+            store_id = user_store['store_id']
+
+            # 查找商店的所有订单
+            orders = list(self.db.new_order.find({"store_id": store_id}))
+
+        except Exception as e:
+            return 530, "{}".format(str(e)), None
+        return 200, "ok", orders

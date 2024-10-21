@@ -21,8 +21,8 @@ class Book:
     author_intro: str
     book_intro: str
     content: str
-    tags: [str]
-    pictures: [bytes]
+    tags: [str] # type: ignore
+    pictures: [bytes] # type: ignore
 
     def __init__(self):
         self.tags = []
@@ -32,8 +32,8 @@ class Book:
 class BookDB:
     def __init__(self, large: bool = False):
         parent_path = os.path.dirname(os.path.dirname(__file__))
-        self.db_s = "/Users/harry/work/数据管理/Lab1/DBLab_1_BookstoreSystem/bookstore/fe/data/book.db"
-        self.db_l = "/Users/harry/work/数据管理/Lab1/DBLab_1_BookstoreSystem/bookstore/fe/data/book_lx.db"
+        self.db_s = "D:/Users/yuanf/Dase_DB/BookstoreSystem/DBLab_1_BookstoreSystem/bookstore/fe/data/book.db"
+        self.db_l = "D:/Users/yuanf/Dase_DB/BookstoreSystem/DBLab_1_BookstoreSystem/bookstore/fe/data/book_lx.db"
         # if large:
         #     self.book_db = self.db_l
         # else:

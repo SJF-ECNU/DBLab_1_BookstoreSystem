@@ -27,13 +27,16 @@ class Buyer:
         response_json = r.json()
         return r.status_code, response_json.get("order_id")
 
-    def payment(self, order_id: str):
-        json = {
-            "user_id": self.user_id,
-            "password": self.password,
-            "order_id": order_id,
-        }
-        url = urljoin(self.url_prefix, "payment")
+    def pay_to_platform(self, order_id: str) -> int:
+        json = {"user_id": self.user_id, "order_id": order_id,"password": self.password}
+        url = urljoin(self.url_prefix, "pay_to_platform")
+        headers = {"token": self.token}
+        r = requests.post(url, headers=headers, json=json)
+        return r.status_code
+
+    def confirm_receipt_and_pay_to_seller(self, order_id: str) -> int:
+        json = {"user_id": self.user_id, "order_id": order_id,"password": self.password}
+        url = urljoin(self.url_prefix, "confirm_receipt_and_pay_toseller")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
         return r.status_code
