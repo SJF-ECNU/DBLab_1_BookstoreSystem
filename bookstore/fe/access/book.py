@@ -1,9 +1,9 @@
 import os
-import sqlite3 as sqlite
 import random
 import base64
 import simplejson as json
-
+from pymongo import MongoClient
+from bson.binary import Binary
 
 class Book:
     id: str
@@ -21,8 +21,8 @@ class Book:
     author_intro: str
     book_intro: str
     content: str
-    tags: [str] # type: ignore
-    pictures: [bytes] # type: ignore
+    tags: list
+    pictures: list
 
     def __init__(self):
         self.tags = []
@@ -31,68 +31,43 @@ class Book:
 
 class BookDB:
     def __init__(self, large: bool = False):
-        parent_path = os.path.dirname(os.path.dirname(__file__))
-        self.db_s = "D:/Users/yuanf/Dase_DB/BookstoreSystem/DBLab_1_BookstoreSystem/bookstore/fe/data/book.db"
-        self.db_l = "D:/Users/yuanf/Dase_DB/BookstoreSystem/DBLab_1_BookstoreSystem/bookstore/fe/data/book_lx.db"
-        # if large:
-        #     self.book_db = self.db_l
-        # else:
-        #     self.book_db = self.db_s
-        self.book_db = self.db_s
+        self.client = MongoClient('mongodb://localhost:27017/')  # 连接到MongoDB
+        self.db = self.client['bookstore']  # 数据库名称
+        self.collection = self.db['books']  # 集合名称
 
     def get_book_count(self):
-        conn = sqlite.connect(self.book_db)
-        cursor = conn.execute("SELECT count(id) FROM book")
-        row = cursor.fetchone()
-        return row[0]
+        return self.collection.count_documents({})
 
     def get_book_info(self, start, size) -> list[Book]:
         books = []
-        conn = sqlite.connect(self.book_db)
-        cursor = conn.execute(
-            "SELECT id, title, author, "
-            "publisher, original_title, "
-            "translator, pub_year, pages, "
-            "price, currency_unit, binding, "
-            "isbn, author_intro, book_intro, "
-            "content, tags, picture FROM book ORDER BY id "
-            "LIMIT ? OFFSET ?",
-            (size, start),
-        )
+        cursor = self.collection.find().skip(start).limit(size)
+
         for row in cursor:
             book = Book()
-            book.id = row[0]
-            book.title = row[1]
-            book.author = row[2]
-            book.publisher = row[3]
-            book.original_title = row[4]
-            book.translator = row[5]
-            book.pub_year = row[6]
-            book.pages = row[7]
-            book.price = row[8]
+            book.id = str(row.get('_id'))  # MongoDB的_id字段
+            book.title = row.get('title')
+            book.author = row.get('author')
+            book.publisher = row.get('publisher')
+            book.original_title = row.get('original_title')
+            book.translator = row.get('translator')
+            book.pub_year = row.get('pub_year')
+            book.pages = row.get('pages')
+            book.price = row.get('price')
+            book.currency_unit = row.get('currency_unit')
+            book.binding = row.get('binding')
+            book.isbn = row.get('isbn')
+            book.author_intro = row.get('author_intro')
+            book.book_intro = row.get('book_intro')
+            book.content = row.get('content')
+            book.tags = row.get('tags', [])
+            
+            # 处理二进制图片数据
+            picture_binary = row.get('picture')
+            if isinstance(picture_binary, Binary):
+                # 将二进制数据转换为Base64编码字符串
+                picture_base64 = base64.b64encode(picture_binary).decode('utf-8')
+                book.pictures.append(picture_base64)
 
-            book.currency_unit = row[9]
-            book.binding = row[10]
-            book.isbn = row[11]
-            book.author_intro = row[12]
-            book.book_intro = row[13]
-            book.content = row[14]
-            tags = row[15]
-
-            picture = row[16]
-
-            for tag in tags.split("\n"):
-                if tag.strip() != "":
-                    book.tags.append(tag)
-            for i in range(0, random.randint(0, 9)):
-                if picture is not None:
-                    encode_str = base64.b64encode(picture).decode("utf-8")
-                    book.pictures.append(encode_str)
             books.append(book)
-            # print(tags.decode('utf-8'))
-
-            # print(book.tags, len(book.picture))
-            # print(book)
-            # print(tags)
 
         return books
