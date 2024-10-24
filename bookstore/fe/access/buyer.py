@@ -27,7 +27,7 @@ class Buyer:
         response_json = r.json()
         return r.status_code, response_json.get("order_id")
 
-    def pay_to_platform(self, order_id: str) -> int:
+    def payment(self, order_id: str) -> int:
         json = {"user_id": self.user_id, "order_id": order_id,"password": self.password}
         url = urljoin(self.url_prefix, "pay_to_platform")
         headers = {"token": self.token}
