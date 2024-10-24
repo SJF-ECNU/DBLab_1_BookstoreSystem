@@ -1,11 +1,20 @@
 import pytest
-
+from fe.access.buyer import Buyer
 from fe.test.gen_book_data import GenBook
 from fe.access.new_buyer import register_new_buyer
 import uuid
 
 
 class TestNewOrder:
+    seller_id: str
+    store_id: str
+    buyer_id: str
+    password: str
+    buy_book_info_list: [Book]
+    total_price: int
+    order_id: str
+    seller_id: 
+    buyer: Buyer
     @pytest.fixture(autouse=True)
     def pre_run_initialization(self):
         self.seller_id = "test_new_order_seller_id_{}".format(str(uuid.uuid1()))
