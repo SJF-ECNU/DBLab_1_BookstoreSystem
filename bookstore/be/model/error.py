@@ -10,8 +10,8 @@ error_code = {
     518: "invalid order id {}",
     519: "not sufficient funds, order id {}",
     520: "not be paid, order id {}",
-    521: "cannot be canceled, order id {}",
-    522: "no store for user, user id {}",
+    521: "",
+    522: "",
     523: "",
     524: "",
     525: "",
@@ -57,14 +57,9 @@ def error_not_sufficient_funds(order_id):
     return 519, error_code[519].format(order_id)
 
 
-def error_not_be_paid(order_id):
+def not_be_paid(order_id):
     return 520, error_code[520].format(order_id)
 
-def error_cannot_be_canceled(order_id):
-    return 521, error_code[521].format(order_id)
-
-def error_no_store_found(user_id):
-    return 522, error_code[522].format(user_id)
 
 def error_authorization_fail():
     return 401, error_code[401]

@@ -4,10 +4,7 @@ from urllib.parse import urljoin
 from be import serve
 from be.model.store import init_completed_event
 from fe import conf
-# fe/conftest.py
-import requests
 
-# 其他配置代码
 thread: threading.Thread = None
 
 
