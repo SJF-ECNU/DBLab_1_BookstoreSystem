@@ -15,7 +15,7 @@ class Buyer:
         code, self.token = self.auth.login(self.user_id, self.password, self.terminal)
         assert code == 200
 
-    def new_order(self, store_id: str, book_id_and_count: [(str, int)]) -> (int, str):
+    def new_order(self, store_id: str, book_id_and_count: [(str, int)]) -> (int, str): # type: ignore
         books = []
         for id_count_pair in book_id_and_count:
             books.append({"id": id_count_pair[0], "count": id_count_pair[1]})
@@ -53,22 +53,22 @@ class Buyer:
         return r.status_code
 
     # 查询订单状态
-    def query_order_status(self, order_id: str) -> (int, str, list): # type: ignore
-        json = {"user_id": self.user_id, "order_id": order_id, "password": self.password}
+    def query_order_status(self, order_id: str, user_id: str) -> (int, str, list): # type: ignore
+        json = {"user_id": user_id, "order_id": order_id, "password": self.password}
         url = urljoin(self.url_prefix, "query_order_status")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
         response_json = r.json()
-        return r.status_code, response_json.get("message"), response_json.get("order_status")
+        return response_json.get("code"), response_json.get("message")
 
     # 取消订单
-    def cancel_order(self, order_id: str) -> (int, str): # type: ignore
-        json = {"user_id": self.user_id, "order_id": order_id, "password": self.password}
+    def cancel_order(self, order_id: str, user_id: str) -> (int, str): # type: ignore
+        json = {"user_id": user_id, "order_id": order_id, "password": self.password}
         url = urljoin(self.url_prefix, "cancel_order")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
         response_json = r.json()
-        return r.status_code, response_json.get("message")
+        return response_json.get("code"), response_json.get("message")
 
     # 自动取消超时订单
     def auto_cancel_expired_orders(self) -> (int, str): # type: ignore
@@ -76,6 +76,6 @@ class Buyer:
         headers = {"token": self.token}
         r = requests.post(url, headers=headers)
         response_json = r.json()
-        return r.status_code, response_json.get("message")
+        return response_json.get("code"), response_json.get("message")
 
   

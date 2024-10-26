@@ -221,33 +221,33 @@ class Buyer(db_conn.DBConn):
 
         return 200, "ok"
 
-    def query_order_status(self, user_id: str, order_id: str, password) -> (int, str, dict): # type: ignore
+    def query_order_status(self, user_id: str, order_id: str, password) -> (int, str, str): # type: ignore
         try:
             # 检查用户是否存在
             if not self.user_id_exist(user_id):
-                return error.error_non_exist_user_id(user_id), None
-            
+                return error.error_non_exist_user_id(user_id) + ("None",)
+
             user = self.db.user.find_one({"user_id": user_id})
             if user is None or user['password'] != password:
-                return error.error_authorization_fail(), None
+                return error.error_authorization_fail() + ("None",)
 
             # 查找订单
             order = self.db.new_order.find_one({"order_id": order_id, "user_id": user_id})
             if order is None:
-                return error.error_invalid_order_id(order_id), None
+                return error.error_invalid_order_id(order_id) + ("None",)
 
             # 返回订单状态
             order_status = self.ORDER_STATUS[order['status']]
+
             return 200, "ok", order_status
         except Exception as e:
-            return 530, "{}".format(str(e)), None
+            return 530, "{}".format(str(e)) + ("None",)
 
     # def query_user_orders(self, user_id: str) -> (int, str, list): # type: ignore
     #     try:
     #         # 检查用户是否存在
     #         if not self.user_id_exist(user_id):
-    #             return error.error_non_exist_user_id(user_id), None
-
+                # return error.error_non_exist_user_id(user_id) + ("None",)
     #         # 查找用户的所有订单
     #         orders = list(self.db.new_order.find({"user_id": user_id}))
 

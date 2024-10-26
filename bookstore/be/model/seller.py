@@ -109,22 +109,49 @@ class Seller(db_conn.DBConn):
             return 520, "{}".format(str(e))
         return 200, "ok"
 
-    def query_store_orders(self, user_id: str) -> (int, str, list): # type: ignore
+    
+
+    def query_one_store_orders(self, user_id: str, store_id: str) -> (int, str, list): # type: ignore
         try:
-            # 检查用户是否存在
+            # 检查用户与商店是否存在
             if not self.user_id_exist(user_id):
-                return error.error_non_exist_user_id(user_id)
+                return error.error_non_exist_user_id(user_id) + ("None",)
+            if not self.store_id_exist(store_id):
+                return error.error_non_exist_store_id(store_id) + ("None",)
 
-            # 查找用户的店铺
-            user_store = self.db.user_store.find_one({"user_id": user_id})
+            # 查找用户是否存在该商店
+            user_store = self.db.user_store.find({"user_id": user_id, "store_id": store_id})
             if user_store is None:
-                return error.error_no_store_found(user_id)
+                return error.error_no_store_found(user_id) + ("None",)
 
-            store_id = user_store['store_id']
-
-            # 查找商店的所有订单
+            # 查找该商店的所有订单
             orders = list(self.db.new_order.find({"store_id": store_id}))
 
         except Exception as e:
-            return 530, "{}".format(str(e)), None
-        return 200, "ok", orders
+            return 530, "{}".format(str(e)), "None"
+        return 200, "ok", str(orders)
+
+    def query_all_store_orders(self, user_id: str) -> (int, str, list): # type: ignore
+        try:
+            # 检查用户是否存在
+            if not self.user_id_exist(user_id):
+                return error.error_non_exist_user_id(user_id) + ("None",)
+
+            # 查找用户的商店
+            user_stores = list(self.db.user_store.find({"user_id": user_id}))
+
+            if user_stores is None:
+                return error.error_no_store_found(user_id) + ("None",)
+
+            all_store_orders = {}
+            for user_store in user_stores:
+                store_id = user_store['store_id']
+                # 查找该商店的所有订单
+                orders = list(self.db.new_order.find({"store_id": store_id}))
+                all_store_orders[store_id] = orders
+
+        except Exception as e:
+            return 530, "{}".format(str(e)), "None"
+        return 200, "ok", str(all_store_orders)
+
+        

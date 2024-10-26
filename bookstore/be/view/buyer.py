@@ -57,7 +57,7 @@ def query_order_status():
     password = request.json.get("password")
     b = Buyer()
     code, message, order_status = b.query_order_status(user_id, order_id, password)
-    return jsonify({"message": message, "order_status": order_status}), code
+    return jsonify({"message": message, "order_status": order_status, "code": code})
 
 # 取消订单
 @bp_buyer.route('/cancel_order', methods=["POST"])
@@ -67,12 +67,13 @@ def cancel_order():
     password = request.json.get("password")
     b = Buyer()
     code, message = b.cancel_order(user_id, order_id, password)
-    return jsonify({"message": message}), code
+    return jsonify({"message": message, "code": code})
+
 
 # 自动取消超时订单
 @bp_buyer.route('/auto_cancel_expired_orders', methods=['POST'])
 def auto_cancel_expired_orders():
     b = Buyer()
-    code, message = b.cancel_order()
-    return jsonify({"message": message}), code
+    code, message = b.auto_cancel_expired_orders()
+    return jsonify({"message": message, "code": code})
 

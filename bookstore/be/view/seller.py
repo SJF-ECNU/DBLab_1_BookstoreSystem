@@ -50,3 +50,24 @@ def add_stock_level():
     code, message = s.add_stock_level(user_id, store_id, book_id, add_num)
 
     return jsonify({"message": message}), code
+
+
+@bp_seller.route("/query_one_store_orders", methods=["POST"])
+def query_store_orders():
+    user_id: str = request.json.get("user_id")
+    store_id: str = request.json.get("store_id")
+
+    s = seller.Seller()
+    code, message, orders = s.query_one_store_orders(user_id, store_id)
+
+    return jsonify({"message": message, "code": code, "orders": orders})
+
+
+@bp_seller.route("/query_all_store_orders", methods=["POST"])
+def query_all_store_orders():
+    user_id: str = request.json.get("user_id")
+
+    s = seller.Seller()
+    code, message, orders = s.query_all_store_orders(user_id)
+
+    return jsonify({"message": message, "code": code, "orders": orders})
