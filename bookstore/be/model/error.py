@@ -12,12 +12,13 @@ error_code = {
     520: "",
     521: "",
     522: "",
-    523: "",
-    524: "",
-    525: "",
+    523: "Book with ID {} not found.",
+    524: "Store with ID {} not found.",
+    525: "Book with ID {} not found in store with ID {}.",
     526: "",
     527: "",
     528: "",
+    530: "Database operation error: {}",
 }
 
 
@@ -56,6 +57,17 @@ def error_invalid_order_id(order_id):
 def error_not_sufficient_funds(order_id):
     return 519, error_code[518].format(order_id)
 
+def error_book_not_found(book_id):
+    return 523, error_code[523].format(book_id)
+
+def error_store_not_found(store_id):
+    return 524, error_code[524].format(store_id)
+
+def error_book_not_found_in_the_store(book_id, store_id):
+    return 525, error_code[525].format(book_id, store_id)
+
+def db_operation_error(e):
+    return 530, error_code[530].format(str(e))
 
 def error_authorization_fail():
     return 401, error_code[401]
