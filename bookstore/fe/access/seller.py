@@ -76,3 +76,16 @@ class Seller:
         r = requests.post(url, headers=headers, json=json)
         response_json = r.json()
         return response_json.get("code"), response_json.get("message"), response_json.get("orders")
+
+    def ship(self, seller_id: str, store_id: str, order_id: str) -> (int, str):
+        json = {
+            "user_id": seller_id,
+            "store_id": store_id, 
+            "order_id": order_id,
+        }
+        url = urljoin(self.url_prefix, "ship")
+        headers = {"token": self.token}
+        r = requests.post(url, headers=headers, json=json)
+        response_json = r.json()
+        code=response_json.get("code")
+        return code

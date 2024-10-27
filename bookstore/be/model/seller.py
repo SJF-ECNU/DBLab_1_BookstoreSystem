@@ -33,7 +33,7 @@ class Seller(db_conn.DBConn):
                 "book_info": book_json_str,
                 "stock_level": stock_level
             })
-        except Exception as e:
+        except Exception as e:# pragma: no cover
             return 530, "{}".format(str(e))
         return 200, "ok"
 
@@ -58,7 +58,7 @@ class Seller(db_conn.DBConn):
                 {"store_id": store_id, "book_id": book_id},
                 {"$inc": {"stock_level": add_stock_level}}
             )
-        except Exception as e:
+        except Exception as e:# pragma: no cover
             return 530, "{}".format(str(e))
         return 200, "ok"
 
@@ -76,7 +76,7 @@ class Seller(db_conn.DBConn):
                 "store_id": store_id,
                 "user_id": user_id
             })
-        except Exception as e:
+        except Exception as e:# pragma: no cover
             return 530, "{}".format(str(e))
         return 200, "ok"
 
@@ -99,13 +99,16 @@ class Seller(db_conn.DBConn):
             # 检查订单是否已经支付
             if not self.order_is_paid(order_id):
                 return error.error_not_be_paid(order_id)
+            # 检查订单是否已经发货
+            if self.order_is_shipped(order_id):
+                return error.error_order_is_shipped(order_id)
             # 更新订单状态
             self.db["new_order"].update_one(
                 {"order_id": order_id, "store_id": store_id},
                 {"$set": {"is_shipped": True}}
             )
         
-        except Exception as e:
+        except Exception as e:# pragma: no cover
             return 520, "{}".format(str(e))
         return 200, "ok"
 
@@ -127,7 +130,7 @@ class Seller(db_conn.DBConn):
             # 查找该商店的所有订单
             orders = list(self.db.new_order.find({"store_id": store_id}))
 
-        except Exception as e:
+        except Exception as e:# pragma: no cover
             return 530, "{}".format(str(e)), "None"
         return 200, "ok", str(orders)
 
@@ -150,7 +153,7 @@ class Seller(db_conn.DBConn):
                 orders = list(self.db.new_order.find({"store_id": store_id}))
                 all_store_orders[store_id] = orders
 
-        except Exception as e:
+        except Exception as e:# pragma: no cover
             return 530, "{}".format(str(e)), "None"
         return 200, "ok", str(all_store_orders)
 
