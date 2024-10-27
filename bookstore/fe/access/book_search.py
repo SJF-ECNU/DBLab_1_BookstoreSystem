@@ -25,20 +25,14 @@ class BookSearcher:
             "search_scope": search_scope,
         }
 
-        # 如果指定了 store_id，则加入到请求体中
         if store_id is not None:
             json_data["search_in_store"] = True
             json_data["store_id"] = store_id
         else:
             json_data["search_in_store"] = False
 
-        # 设置 URL 和请求头
         url = urljoin(self.url_prefix, "books")
         headers = {"token": self.token}
-
-        # 发送 POST 请求进行搜索
         response = requests.post(url, headers=headers, json=json_data)
-        
-        # 返回状态码和结果（或错误消息）
         return response.status_code, response.json()
 
