@@ -34,7 +34,6 @@ def seller_add_book():
 def ship():
     user_id: str = request.json.get("user_id")
     order_id: str = request.json.get("order_id")
-    order_id: str = request.json.get("order_id")
     s = seller.Seller()
     code, message = s.ship(user_id, order_id,order_id)
     return jsonify({"message": message}), code
