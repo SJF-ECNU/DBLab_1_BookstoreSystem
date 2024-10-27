@@ -25,7 +25,7 @@ def new_order():
 @bp_buyer.route("/pay_to_platform", methods=["POST"])
 def pay_to_platform():
     user_id = request.json.get("user_id")
-    password = request.json.get("password")
+    password = request.json.get("password")  # 后端需要添加判断密码的相关操作
     order_id = request.json.get("order_id")
     b = Buyer()
     code, message = b.pay_to_platform(user_id, password, order_id)
@@ -34,7 +34,7 @@ def pay_to_platform():
 @bp_buyer.route("/confirm_receipt_and_pay_toseller", methods=["POST"])
 def confirm_receipt_and_pay_toseller():
     user_id = request.json.get("user_id")
-    password = request.json.get("password")
+    password = request.json.get("password") # 后端需要添加判断密码的相关操作
     order_id = request.json.get("order_id")
     b = Buyer()
     code, message = b.confirm_receipt_and_pay_to_seller(user_id, password, order_id)
@@ -48,3 +48,32 @@ def add_funds():
     b = Buyer()
     code, message = b.add_funds(user_id, password, add_value)
     return jsonify({"message": message}), code
+
+# 查询订单状态
+@bp_buyer.route('/query_order_status', methods=["POST"])
+def query_order_status():
+    user_id = request.json.get("user_id")
+    order_id = request.json.get("order_id")
+    password = request.json.get("password")
+    b = Buyer()
+    code, message, order_status = b.query_order_status(user_id, order_id, password)
+    return jsonify({"message": message, "order_status": order_status, "code": code})
+
+# 取消订单
+@bp_buyer.route('/cancel_order', methods=["POST"])
+def cancel_order():
+    user_id = request.json.get("user_id")
+    order_id = request.json.get("order_id")
+    password = request.json.get("password")
+    b = Buyer()
+    code, message = b.cancel_order(user_id, order_id, password)
+    return jsonify({"message": message, "code": code})
+
+
+# 自动取消超时订单
+@bp_buyer.route('/auto_cancel_expired_orders', methods=['POST'])
+def auto_cancel_expired_orders():
+    b = Buyer()
+    code, message = b.auto_cancel_expired_orders()
+    return jsonify({"message": message, "code": code})
+

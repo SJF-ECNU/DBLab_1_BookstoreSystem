@@ -69,5 +69,5 @@ class BookDB:
                 book.pictures.append(picture_base64)
 
             books.append(book)
-
         return books
+
