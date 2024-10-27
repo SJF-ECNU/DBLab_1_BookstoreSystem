@@ -77,7 +77,7 @@ class TestConfirmReceipt:
         code = self.buyer.add_funds(self.total_price)
         assert code == 200
 
-        code= self.buyer.cancel_order(self.order_id, self.buyer_id)
+        code= self.buyer.cancel_order(self.order_id, self.buyer_id,self.password)
         assert code[0] == 200
 
         code = self.buyer.confirm_receipt_and_pay_to_seller(self.order_id)

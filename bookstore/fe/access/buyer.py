@@ -52,17 +52,27 @@ class Buyer:
         return r.status_code
 
     # 查询订单状态
-    def query_order_status(self, order_id: str, user_id: str) -> (int, str, list): # type: ignore
-        json = {"user_id": user_id, "order_id": order_id, "password": self.password}
+    def query_order_status(self, order_id: str, user_id: str, password: str) -> (int, str, list): # type: ignore
+        json = {"user_id": user_id, "order_id": order_id, "password": password}
         url = urljoin(self.url_prefix, "query_order_status")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
         response_json = r.json()
-        return response_json.get("code"), response_json.get("message")
+        return response_json.get("code"), response_json.get("message"), response_json.get("order_status")
+
+    # 查询用户所有订单
+    def query_buyer_all_orders(self, user_id: str, password: str) -> (int, str, list): # type: ignore
+        json = {"user_id": user_id, "password": password}
+        url = urljoin(self.url_prefix, "query_buyer_all_orders")
+        headers = {"token": self.token}
+        r = requests.post(url, headers=headers, json=json)
+        response_json = r.json()
+        return response_json.get("code"), response_json.get("message"), response_json.get("orders")
+
 
     # 取消订单
-    def cancel_order(self, order_id: str, user_id: str) -> (int, str): # type: ignore
-        json = {"user_id": user_id, "order_id": order_id, "password": self.password}
+    def cancel_order(self, order_id: str, user_id: str, password: str) -> (int, str): # type: ignore
+        json = {"user_id": user_id, "order_id": order_id, "password": password}
         url = urljoin(self.url_prefix, "cancel_order")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
