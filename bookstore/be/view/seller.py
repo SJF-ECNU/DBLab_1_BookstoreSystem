@@ -56,9 +56,10 @@ def add_stock_level():
 def query_store_orders():
     user_id: str = request.json.get("user_id")
     store_id: str = request.json.get("store_id")
+    password = request.json.get("password")
 
     s = seller.Seller()
-    code, message, orders = s.query_one_store_orders(user_id, store_id)
+    code, message, orders = s.query_one_store_orders(user_id, store_id, password)
 
     return jsonify({"message": message, "code": code, "orders": orders})
 
@@ -66,8 +67,9 @@ def query_store_orders():
 @bp_seller.route("/query_all_store_orders", methods=["POST"])
 def query_all_store_orders():
     user_id: str = request.json.get("user_id")
+    password = request.json.get("password")
 
     s = seller.Seller()
-    code, message, orders = s.query_all_store_orders(user_id)
+    code, message, orders = s.query_all_store_orders(user_id, password)
 
     return jsonify({"message": message, "code": code, "orders": orders})

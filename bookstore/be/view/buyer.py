@@ -59,6 +59,15 @@ def query_order_status():
     code, message, order_status = b.query_order_status(user_id, order_id, password)
     return jsonify({"message": message, "order_status": order_status, "code": code})
 
+# 查询所有订单
+@bp_buyer.route('/query_buyer_all_orders', methods=["POST"])
+def query_buyer_all_orders():
+    user_id = request.json.get("user_id")
+    password = request.json.get("password")
+    b = Buyer()
+    code, message, orders = b.query_buyer_all_orders(user_id, password)
+    return jsonify({"message": message, "orders": orders, "code": code})
+
 # 取消订单
 @bp_buyer.route('/cancel_order', methods=["POST"])
 def cancel_order():

@@ -9,7 +9,8 @@ class TestOrderFunctions:
     seller_id: str
     store_id: str
     buyer_id: str
-    password: str
+    buyer_password: str
+    seller_password: str
     buy_book_info_list: [Book] # type: ignore
     total_price: int
     order_id: str
@@ -19,11 +20,12 @@ class TestOrderFunctions:
         self.seller_id = "test_order_functions_seller_id_{}".format(str(uuid.uuid1()))
         self.store_id = "test_order_functions_store_id_{}".format(str(uuid.uuid1()))
         self.buyer_id = "test_order_functions_buyer_id_{}".format(str(uuid.uuid1()))
-        self.password = self.buyer_id
+        self.buyer_password = self.buyer_id
 
         gen_book = GenBook(self.seller_id, self.store_id)
         
         self.seller = gen_book.seller
+        self.seller_password = self.seller.password
         
         ok, buy_book_id_list = gen_book.gen(
             non_exist_book_id=False, low_stock_level=False, max_book_count=5
@@ -31,7 +33,9 @@ class TestOrderFunctions:
         self.buy_book_info_list = gen_book.buy_book_info_list
         assert ok
 
-        b = register_new_buyer(self.buyer_id, self.password)
+        b = register_new_buyer(self.buyer_id, self.buyer_password)
+
+
         self.buyer = b
         code, self.order_id = b.new_order(self.store_id, buy_book_id_list)
         assert code == 200
@@ -47,11 +51,18 @@ class TestOrderFunctions:
 
 
         self.order_lists = []
+        self.seller_id_lists = []
+        self.store_id_lists = []
         for i in range(5):
             seller_id = "test_order_functions_seller_id_{}_{}".format(str(uuid.uuid1()), i)
             store_id = "test_order_functions_store_id_{}_{}".format(str(uuid.uuid1()), i)
             gen_book = GenBook(seller_id, store_id)
-
+            
+            seller = gen_book.seller
+    
+            self.seller_id_lists.append(seller.seller_id)
+            self.store_id_lists.append(store_id)
+        
             ok, buy_book_id_list = gen_book.gen(
                 non_exist_book_id=False, low_stock_level=False, max_book_count=i+1
             )
@@ -65,38 +76,68 @@ class TestOrderFunctions:
 
 
     def test_query_order_status_ok(self):
-        code, _ = self.buyer.query_order_status(self.order_id, self.buyer_id)
+        code, _, _ = self.buyer.query_order_status(self.order_id, self.buyer_id, self.buyer_password)
+        assert code == 200
+
+    def test_query_buyer_all_orders_ok(self):
+        code, _, _ = self.buyer.query_buyer_all_orders(self.buyer_id, self.buyer_password)
         assert code == 200
 
     def test_cancel_order_ok(self):
-        code, _ = self.buyer.cancel_order(self.order_id, self.buyer_id)
+        code, _ = self.buyer.cancel_order(self.order_id, self.buyer_id, self.buyer_password)
         assert code == 200
     
+    def test_query_order_status_fail(self):
+        # 用户不存在
+        user_id_test = self.buyer_id + "_x"
+        code, _, _ = self.buyer.query_order_status(self.order_id, user_id_test, self.buyer_password)
+        assert code != 200
+
+        # 订单不存在
+        order_id_test = self.order_id + "_x"
+        code, _, _ = self.buyer.query_order_status(order_id_test, self.buyer_id, self.buyer_password)
+        assert code != 200
+
+        # 密码不匹配
+        password_test = self.buyer_password + "_x"
+        code, _, _ = self.buyer.query_order_status(self.order_id, self.buyer_id, password_test)
+        assert code != 200
+
+    def test_query_buyer_all_orders_fail(self):
+        # 用户不存在
+        user_id_test = self.buyer_id + "_x"
+        code, _, _ = self.buyer.query_buyer_all_orders(user_id_test, self.buyer_password)
+        assert code != 200
+
+        # 密码不匹配
+        password_test = self.buyer_password + "_x"
+        code, _, _ = self.buyer.query_buyer_all_orders(self.buyer_id, password_test)
+        assert code != 200
+    
+
     def test_cancel_order_fail(self):
+        # 用户不存在
+        user_id_test = self.buyer_id + "_x"
+        code, _ = self.buyer.cancel_order(self.order_id, user_id_test, self.buyer_password)
+        assert code != 200
+
+        # 订单不存在
+        order_id_test = self.order_id + "_x"
+        code, _ = self.buyer.cancel_order(order_id_test, self.buyer_id, self.buyer_password)
+        assert code != 200
+
+        # 密码不匹配
+        password_test = self.buyer_password + "_x"
+        code, _ = self.buyer.cancel_order(self.order_id, self.buyer_id, password_test)
+        assert code != 200
+
+        # 支付后取消订单失败
         code = self.buyer.add_funds(self.total_price)
         assert code == 200
         code = self.buyer.payment(self.order_id)
         assert code == 200
-        code, _ = self.buyer.cancel_order(self.order_id, self.buyer_id)
+        code, _ = self.buyer.cancel_order(self.order_id, self.buyer_id, self.buyer_password)
         assert code != 200
-
-    def test_non_exist_user_id(self):
-
-        self.buyer.user_id = self.buyer.user_id + "_x"
-        query_code, _= self.buyer.query_order_status(self.order_id, self.buyer.user_id)
-        assert query_code != 200
-
-        cancel_code, _ = self.buyer.cancel_order(self.order_id, self.buyer.user_id)
-        assert cancel_code != 200
-
-    def test_non_exist_order_id(self):
-
-        self.order_id= self.order_id + "_x"
-        query_code, _ = self.buyer.query_order_status(self.order_id, self.buyer_id)
-        assert query_code != 200
-
-        cancel_code, _ = self.buyer.cancel_order(self.order_id, self.buyer_id)
-        assert cancel_code != 200
 
     def test_auto_cancel_expired_orders(self):
         # 循环调用自动取消接口，每隔3秒一次，执行5次
@@ -104,29 +145,48 @@ class TestOrderFunctions:
             code, message = self.buyer.auto_cancel_expired_orders()
             assert code == 200
             print(f"Auto cancel expired orders call result: {message}")
-            time.sleep(3)  # 等待3秒
+            time.sleep(2)  # 等待2秒
 
     def test_query_one_store_orders_ok(self):
-        code, _, _ = self.seller.query_one_store_orders(self.seller.seller_id, self.store_id)
+        code, _, _ = self.seller.query_one_store_orders(self.seller.seller_id, self.store_id, self.seller_password)
         assert code == 200
 
-
     def test_query_all_store_orders_ok(self):
-        code, _, _ = self.seller.query_all_store_orders(self.seller.seller_id)
+        code, _, _ = self.seller.query_all_store_orders(self.seller.seller_id, self.seller_password)
         assert code == 200
 
     def test_query_one_store_orders_fali(self):
-        
-        seller_id = self.seller.seller_id+ "_x"
-        code, _, _ = self.seller.query_one_store_orders(seller_id, self.store_id)
+        # 用户不存在
+        seller_id_test = self.seller.seller_id+ "_x"
+        code, _, _ = self.seller.query_one_store_orders(seller_id_test, self.store_id, self.seller_password)
         assert code != 200
 
-        store_id = self.store_id + "_x"
-        code, _, _ = self.seller.query_one_store_orders(self.seller.seller_id, store_id)
+        # 商店不存在
+        store_id_test = self.store_id + "_x"
+        code, _, _ = self.seller.query_one_store_orders(self.seller.seller_id, store_id_test, self.seller_password)
         assert code != 200
 
+        # 密码不匹配
+        password_test = self.seller_password+ "_x"
+        code, _, _ = self.seller.query_one_store_orders(self.seller.seller_id, self.store_id, password_test)
+        assert code != 200
+
+        # 用户不存在该商店
+        code, _, _ = self.seller.query_one_store_orders(self.seller.seller_id, self.store_id_lists[2], self.seller_password)
+        assert code != 200
 
     def test_query_all_store_orders_fail(self):
-        seller_id = self.seller.seller_id+ "_x"
-        code, _, _ = self.seller.query_all_store_orders(seller_id)
+        # 用户不存在
+        seller_id_test = self.seller.seller_id+ "_x"
+        code, _, _ = self.seller.query_all_store_orders(seller_id_test, self.seller_password)
         assert code != 200
+
+        # 密码不匹配
+        password_test = self.seller_password+ "_x"
+        code, _, _ = self.seller.query_all_store_orders(self.seller.seller_id, password_test)
+        assert code != 200
+
+        # 该用户没有商店
+        code, _, _ = self.seller.query_all_store_orders(self.buyer_id, self.buyer_password)
+        assert code != 200
+        

@@ -111,36 +111,48 @@ class Seller(db_conn.DBConn):
 
     
 
-    def query_one_store_orders(self, user_id: str, store_id: str) -> (int, str, list): # type: ignore
+    def query_one_store_orders(self, user_id: str, store_id: str, password) -> (int, str, list): # type: ignore
         try:
             # 检查用户与商店是否存在
             if not self.user_id_exist(user_id):
                 return error.error_non_exist_user_id(user_id) + ("None",)
             if not self.store_id_exist(store_id):
                 return error.error_non_exist_store_id(store_id) + ("None",)
+            
+            # 检查用户密码是否正确
+            user = self.db.user.find_one({"user_id": user_id})
+            if user['password'] != password:
+                return error.error_authorization_fail() + ("None",)
 
             # 查找用户是否存在该商店
-            user_store = self.db.user_store.find({"user_id": user_id, "store_id": store_id})
-            if user_store is None:
+            user_store = self.db.user_store.find_one({"user_id": user_id, "store_id": store_id})
+            
+            if not user_store:
                 return error.error_no_store_found(user_id) + ("None",)
 
             # 查找该商店的所有订单
             orders = list(self.db.new_order.find({"store_id": store_id}))
 
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             return 530, "{}".format(str(e)), "None"
         return 200, "ok", str(orders)
 
-    def query_all_store_orders(self, user_id: str) -> (int, str, list): # type: ignore
+    def query_all_store_orders(self, user_id: str, password) -> (int, str, list): # type: ignore
         try:
             # 检查用户是否存在
             if not self.user_id_exist(user_id):
                 return error.error_non_exist_user_id(user_id) + ("None",)
 
-            # 查找用户的商店
-            user_stores = list(self.db.user_store.find({"user_id": user_id}))
+            # 检查用户密码是否正确
+            user = self.db.user.find_one({"user_id": user_id})
+            if user['password'] != password:
+                return error.error_authorization_fail() + ("None",)
 
-            if user_stores is None:
+            # 查找用户的商店
+            user_stores = self.db.user_store.find({"user_id": user_id})
+
+            # 检查是否有商店
+            if self.db.user_store.count_documents({"user_id": user_id}) == 0:
                 return error.error_no_store_found(user_id) + ("None",)
 
             all_store_orders = {}
@@ -150,7 +162,7 @@ class Seller(db_conn.DBConn):
                 orders = list(self.db.new_order.find({"store_id": store_id}))
                 all_store_orders[store_id] = orders
 
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             return 530, "{}".format(str(e)), "None"
         return 200, "ok", str(all_store_orders)
 

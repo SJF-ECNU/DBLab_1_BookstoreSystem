@@ -226,9 +226,10 @@ class Buyer(db_conn.DBConn):
             # 检查用户是否存在
             if not self.user_id_exist(user_id):
                 return error.error_non_exist_user_id(user_id) + ("None",)
-
+            
+            # 检查用户密码是否正确
             user = self.db.user.find_one({"user_id": user_id})
-            if user is None or user['password'] != password:
+            if user['password'] != password:
                 return error.error_authorization_fail() + ("None",)
 
             # 查找订单
@@ -240,29 +241,36 @@ class Buyer(db_conn.DBConn):
             order_status = self.ORDER_STATUS[order['status']]
 
             return 200, "ok", order_status
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             return 530, "{}".format(str(e)) + ("None",)
 
-    # def query_user_orders(self, user_id: str) -> (int, str, list): # type: ignore
-    #     try:
-    #         # 检查用户是否存在
-    #         if not self.user_id_exist(user_id):
-                # return error.error_non_exist_user_id(user_id) + ("None",)
-    #         # 查找用户的所有订单
-    #         orders = list(self.db.new_order.find({"user_id": user_id}))
+    def query_buyer_all_orders(self, user_id: str, password) -> (int, str, list): # type: ignore
+        try:
+            # 检查用户是否存在
+            if not self.user_id_exist(user_id):
+                return error.error_non_exist_user_id(user_id) + ("None",)
+            
+            # 检查用户密码是否正确
+            user = self.db.user.find_one({"user_id": user_id})
+            if user['password'] != password:
+                return error.error_authorization_fail() + ("None",)
 
-    #         return 200, "ok", orders
-    #     except Exception as e:
-    #         return 530, "{}".format(str(e)), None
+            # 查找用户的所有订单
+            orders = list(self.db.new_order.find({"user_id": user_id}))
+
+            return 200, "ok", str(orders)
+        except Exception as e: # pragma: no cover
+            return 530, "{}".format(str(e)), None
 
     def cancel_order(self, user_id: str, order_id: str, password) -> (int, str): # type: ignore
         try:
             # 检查用户是否存在
             if not self.user_id_exist(user_id):
                 return error.error_non_exist_user_id(user_id)
-            
+
+            # 检查用户密码是否正确
             user = self.db.user.find_one({"user_id": user_id})
-            if user is None or user['password'] != password:
+            if user['password'] != password:
                 return error.error_authorization_fail()
 
             # 查找订单
@@ -292,7 +300,7 @@ class Buyer(db_conn.DBConn):
             # self.db.new_order.delete_one({"order_id": order_id})
             # self.db.new_order_detail.delete_many({"order_id": order_id})
 
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             return 530, "{}".format(str(e))
 
         return 200, "ok"
@@ -302,8 +310,8 @@ class Buyer(db_conn.DBConn):
             # 获取当前时间
             now = datetime.utcnow()
 
-            # 设定超时时间为 10 s
-            timeout_duration = timedelta(seconds=10)
+            # 设定超时时间为 2 s
+            timeout_duration = timedelta(seconds=2)
 
             # 查找所有未支付的订单
             pending_orders = self.db.new_order.find({"is_paid": False})
@@ -326,19 +334,8 @@ class Buyer(db_conn.DBConn):
                             {"store_id": order['store_id'], "book_id": detail['book_id']},
                             {"$inc": {"stock_level": detail['count']}}
                         )
-        except Exception as e:
+        except Exception as e: # pragma: no cover
             logging.error(f"Error cancelling expired orders: {str(e)}")
         return 200, "ok"
 
-
-
-    def run_periodic_tasks(self):
-        schedule.every(10).minutes.do(self.auto_cancel_expired_orders)  # 每 10 分钟检查一次超时订单
-
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
-
-    # 在应用启动时运行
-    # run_periodic_tasks()
 

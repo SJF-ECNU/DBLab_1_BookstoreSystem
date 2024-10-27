@@ -53,10 +53,11 @@ class Seller:
         r = requests.post(url, headers=headers, json=json)
         return r.status_code
 
-    def query_one_store_orders(self, seller_id: str, store_id: str):
+    def query_one_store_orders(self, seller_id: str, store_id: str, password):
         json = {
             "user_id": seller_id,
             "store_id": store_id,
+            "password": password
         }
 
         url = urljoin(self.url_prefix, "query_one_store_orders")
@@ -66,9 +67,10 @@ class Seller:
         return response_json.get("code"), response_json.get("message"), response_json.get("orders")
     
 
-    def query_all_store_orders(self, seller_id: str):
+    def query_all_store_orders(self, seller_id: str, password):
         json = {
             "user_id": seller_id,
+            "password": password
         }
 
         url = urljoin(self.url_prefix, "query_all_store_orders")
