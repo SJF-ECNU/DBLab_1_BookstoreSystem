@@ -19,7 +19,6 @@ class TestSearchBooks:
             store_id=self.store_id
         )
         assert code == 523
-        # assert "Book with ID" in message
 
     def test_non_exist_store_id(self):
         # 测试不存在的store_id，期望返回 524 错误码
@@ -30,7 +29,6 @@ class TestSearchBooks:
             store_id="non_existent_store_id"
         )
         assert code == 524
-        # assert "Store with ID" in message
 
     def test_non_exist_book_id_in_the_store(self):
         # 测试书籍不存在store_id对应的store中，期望返回 525 错误码
@@ -41,7 +39,6 @@ class TestSearchBooks:
             store_id=self.store_id
         )
         assert code == 525
-        # assert "Book with ID" in message
 
     def test_partial_scope_search(self):
         # 测试部分匹配 scope 搜索
@@ -51,9 +48,6 @@ class TestSearchBooks:
             search_in_store=False
         )
         assert code == 200
-        # assert isinstance(results, list)
-        # for result in results:
-        #     assert "title" in result or "tags" in result
 
     def test_full_scope_search(self):
         # 测试全范围搜索
@@ -63,9 +57,6 @@ class TestSearchBooks:
             search_in_store=False
         )
         assert code == 200
-        # assert isinstance(results, list)
-        # for result in results:
-        #     assert any(field in result for field in ["title", "tags", "content", "book_intro"])
 
     def test_search_books_in_existing_store(self):
         # 测试在存在的store_id中搜索书籍
@@ -76,4 +67,3 @@ class TestSearchBooks:
             store_id=self.store_id
         )
         assert code == 200
-        # assert isinstance(results, list)

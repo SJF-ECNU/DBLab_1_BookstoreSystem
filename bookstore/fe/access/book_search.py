@@ -32,13 +32,8 @@ class BookSearcher:
         else:
             json_data["search_in_store"] = False
 
-        # 设置 URL 和请求头
         url = urljoin(self.url_prefix, "books")
         headers = {"token": self.token}
-
-        # 发送 POST 请求进行搜索
         response = requests.post(url, headers=headers, json=json_data)
-        
-        # 返回状态码和结果（或错误消息）
         return response.status_code, response.json()
 

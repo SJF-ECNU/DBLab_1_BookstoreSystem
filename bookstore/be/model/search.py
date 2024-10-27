@@ -83,7 +83,6 @@ class BookStoreSearcher:
         except PyMongoError as e:
             return error.db_operation_error(e)
 
-# 创建对象并使用
 searcher = BookStoreSearcher()
 # code, results = searcher.search_books('丑陋心灵', 'all', True, 'test_add_books_store_id_848aa78c-887a-11ef-89e5-2e81db39535e')
 code, results = searcher.search_books('美丽心灵', 'all')
