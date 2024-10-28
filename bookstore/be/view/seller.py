@@ -51,7 +51,6 @@ def add_stock_level():
 
     return jsonify({"message": message}), code
 
-
 @bp_seller.route("/query_one_store_orders", methods=["POST"])
 def query_store_orders():
     user_id: str = request.json.get("user_id")
