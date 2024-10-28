@@ -5,7 +5,7 @@ from be.model import search
 
 bp_search = Blueprint("search", __name__, url_prefix="/search")
 
-@bp_search.route("/search", methods=["POST"])
+@bp_search.route("/search_books", methods=["POST"])
 def search_books():
     keyword = request.json.get("keyword")
     search_scope = request.json.get("search_scope", "all")
@@ -15,7 +15,4 @@ def search_books():
     manager = search.BookStoreSearcher()
     code, results = manager.search_books(keyword, search_scope, search_in_store, store_id)
 
-    if code == 200:
-        return jsonify({"message": "Search successful", "results": results}), code
-    else:
-        return jsonify({"message": results}), code
+    return jsonify({"message": results}), code
