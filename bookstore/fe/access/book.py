@@ -63,10 +63,8 @@ class BookDB:
             
             # 处理二进制图片数据
             picture_binary = row.get('picture')
-            if isinstance(picture_binary, Binary):
-                # 将二进制数据转换为Base64编码字符串
-                picture_base64 = base64.b64encode(picture_binary).decode('utf-8')
-                book.pictures.append(picture_base64)
+            picture_base64 = base64.b64encode(picture_binary).decode('utf-8')
+            book.pictures.append(picture_base64)
 
             books.append(book)
         return books

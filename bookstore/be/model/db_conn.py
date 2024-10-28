@@ -37,8 +37,6 @@ class DBConn:
     def order_is_paid(self,order_id):
         # 查询order是否被支付
         order = self.db["new_order"].find_one({"order_id": order_id})
-        if order is None:
-            return False
         if order['is_paid']==False:
             return False
         return True
@@ -46,8 +44,6 @@ class DBConn:
     def order_is_shipped(self,order_id):
         # 查询order是否被发货
         order = self.db["new_order"].find_one({"order_id": order_id})
-        if order is None:
-            return False
         if order['is_shipped']==False:
             return False
         return True

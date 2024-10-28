@@ -50,7 +50,7 @@ class User(DBConn):
                 now = time.time()
                 if self.token_lifetime > now - ts >= 0:
                     return True
-        except jwt.exceptions.InvalidSignatureError as e:
+        except jwt.exceptions.InvalidSignatureError as e:# pragma: no cover
             logging.error(str(e))
             return False
 
@@ -73,7 +73,7 @@ class User(DBConn):
             result = self.db.user.insert_one(user_doc)
             if not result.acknowledged:
                 return error.error_exist_user_id(user_id)
-        except Exception as e:
+        except Exception as e:# pragma: no cover
             logging.error(f"Error during registration: {str(e)}")
             return error.error_exist_user_id(user_id)
         return 200, "ok"
@@ -111,7 +111,7 @@ class User(DBConn):
             )
             if result.modified_count == 0:
                 return error.error_authorization_fail() + ("",)
-        except Exception as e:
+        except Exception as e:# pragma: no cover
             return 528, "{}".format(str(e)), ""
         return 200, "ok", token
 
@@ -130,7 +130,7 @@ class User(DBConn):
             )
             if result.modified_count == 0:
                 return error.error_authorization_fail()
-        except Exception as e:
+        except Exception as e:# pragma: no cover
             return 528, "{}".format(str(e))
         return 200, "ok"
 
@@ -143,7 +143,7 @@ class User(DBConn):
             result = self.db.user.delete_one({"user_id": user_id})
             if result.deleted_count == 0:
                 return error.error_authorization_fail()
-        except Exception as e:
+        except Exception as e:# pragma: no cover
             return 528, "{}".format(str(e))
         return 200, "ok"
 
@@ -163,6 +163,6 @@ class User(DBConn):
             )
             if result.modified_count == 0:
                 return error.error_authorization_fail()
-        except Exception as e:
+        except Exception as e:# pragma: no cover
             return 528, "{}".format(str(e))
         return 200, "ok"

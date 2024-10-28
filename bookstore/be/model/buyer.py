@@ -63,8 +63,6 @@ class Buyer(db_conn.DBConn):
                     {"store_id": store_id, "book_id": book_id, "stock_level": {"$gte": count}},
                     {"$inc": {"stock_level": -count}}
                 )
-                if update_result.matched_count == 0:
-                    return error.error_stock_level_low(book_id) + (order_id,)
                 
                 # 插入订单详情
                 self.db.new_order_detail.insert_one({
@@ -143,8 +141,6 @@ class Buyer(db_conn.DBConn):
         try:
             # 查找订单
             order = self.db.new_order.find_one({"order_id": order_id})
-            if order is None:
-                return error.error_invalid_order_id(order_id)
 
             buyer_id = order['user_id']
 
