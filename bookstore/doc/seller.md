@@ -176,3 +176,122 @@ Status Code:
 200 | 创建商铺成功
 5XX | 商铺ID不存在 
 5XX | 图书ID不存在 
+
+
+## 商家查询指定商铺订单信息
+
+
+#### URL
+
+POST http://[address]/seller/query_one_store_orders
+
+#### Request
+Headers:
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+token | string | 登录产生的会话标识 | N
+
+Body:
+
+```json
+{
+  "user_id": "$seller id$",
+  "store_id": "$store id$",
+  "password": "$password$"
+}
+```
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+user_id | string | 卖家用户ID | N
+store_id | string | 商铺ID | N
+password | string | 用户密码 | N
+
+#### Response
+
+- `Status Code`
+
+码 | 描述
+--- | :--
+200 | 查询商铺订单信息成功
+401 | 授权失败
+511 | 用户ID不存在
+513 | 商铺ID不存在
+522 | 卖家不存在该商铺
+530 | 其它异常
+
+- `message`
+
+message | 描述
+--- | ---
+ok  | 查询成功
+authorization fail | 授权失败
+non exist user id {`user_id`} | 用户不存在
+non exist store id {`store_id`} | 商铺不存在
+no store for user, user id {`user_id`} | 卖家不存在该商铺
+Exception e | 异常信息
+
+- `orders`
+
+
+orders | 描述
+--- | ---
+`orders`  | 订单详情
+`None` | 异常状态
+
+
+## 商家查询自己的所有商铺订单信息
+
+
+#### URL
+
+POST http://[address]/seller/query_all_store_orders
+
+#### Request
+Headers:
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+token | string | 登录产生的会话标识 | N
+
+Body:
+
+```json
+{
+  "user_id": "$seller id$",
+  "password": "$password$"
+}
+```
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+user_id | string | 卖家用户ID | N
+password | string | 用户密码 | N
+
+#### Response
+
+- `Status Code`
+
+码 | 描述
+--- | :--
+200 | 查询商铺订单信息成功
+401 | 授权失败
+511 | 用户ID不存在
+522 | 卖家不存在商铺
+530 | 其它异常
+
+- `message`
+
+message | 描述
+--- | ---
+ok  | 查询成功
+authorization fail | 授权失败
+non exist user id {`user_id`} | 用户不存在
+no store for user, user id {`user_id`} | 卖家不存在商铺
+Exception e | 异常信息
+
+- `orders`
+
+orders | 描述
+--- | ---
+`orders`  | 订单详情
+`None` | 异常状态

@@ -142,3 +142,212 @@ Status Code:
 200 | 充值成功
 401 | 授权失败
 5XX | 无效参数
+
+## 买家查询订单状态
+
+#### URL：
+POST http://[address]/buyer/query_order_status
+
+#### Request
+
+Headers:
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+token | string | 登录产生的会话标识 | N
+
+Body:
+
+```json
+{
+  "user_id": "$user id$",
+  "order_id": "$order id$",
+  "password": "$password$"
+}
+```
+
+##### 属性说明：
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+user_id | string | 买家用户ID | N
+order_id | string | 订单ID | N
+password | string | 用户密码 | N
+
+#### Response
+
+- `Status Code`
+
+码 | 描述
+--- | ---
+200 | 查询成功
+401 | 授权失败
+511 | 用户不存在
+518 | 非法订单号
+530 | 其它异常
+
+
+- `message`
+
+message | 描述
+--- | ---
+ok  | 查询成功
+authorization fail | 授权失败
+non exist user id {`user_id`} | 用户不存在
+invalid order id {`order_id`} | 非法订单号
+Exception e | 异常信息
+
+- `order_status`
+
+
+order_status | 描述
+--- | ---
+`pending`  | 待支付
+`paid` | 已支付
+`shipped` | 已发货
+`received` | 已收货
+`completed` | 已完成
+`canceled` | 已取消
+`None` | 异常状态
+
+
+## 买家查询所有订单信息
+
+#### URL：
+POST http://[address]/buyer/query_buyer_all_orders
+
+#### Request
+
+Headers:
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+token | string | 登录产生的会话标识 | N
+
+Body:
+
+```json
+{
+  "user_id": "$user id$",
+  "password": "$password$"
+}
+```
+
+##### 属性说明：
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+user_id | string | 买家用户ID | N
+password | string | 用户密码 | N
+
+#### Response
+
+- `Status Code`
+
+码 | 描述
+--- | ---
+200 | 查询成功
+401 | 授权失败
+511 | 用户不存在
+530 | 其它异常
+
+
+- `message`
+
+message | 描述
+--- | ---
+ok  | 查询成功
+authorization fail | 授权失败
+non exist user id {`user_id`} | 用户不存在
+Exception e | 异常信息
+
+- `orders`
+
+
+orders | 描述
+--- | ---
+`orders`  | 订单详情
+`None` | 异常状态
+
+
+## 买家取消订单
+
+#### URL：
+POST http://[address]/buyer/cancel_order
+
+#### Request
+
+Headers:
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+token | string | 登录产生的会话标识 | N
+
+Body:
+```json
+{
+  "user_id": "$user id$",
+  "order_id": "$order id$",
+  "password": "$password$"
+}
+```
+
+##### 属性说明：
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+user_id | string | 买家用户ID | N
+order_id | string | 订单ID | N
+password | string | 用户密码 | N
+
+#### Response
+
+- `Status Code`
+
+码 | 描述
+--- | ---
+200 | 取消成功
+401 | 授权失败
+511 | 用户不存在
+518 | 非法订单号
+521 | 无法取消订单
+530 | 其它异常
+
+
+- `message`
+
+message | 描述
+--- | ---
+ok  | 取消成功
+authorization fail | 授权失败
+non exist user id {`user_id`} | 用户不存在
+invalid order id {`order_id`} | 非法订单号
+cannot be canceled, order id {`order_id`} | 订单已支付，无法取消
+Exception e | 异常信息
+
+
+## 超时未支付，自动取消订单
+
+#### URL：
+POST http://[address]/buyer/auto_cancel_expired_orders
+
+#### Request
+
+定时自动发送 `request`
+
+#### Response
+
+- `Status Code`
+
+码 | 描述
+--- | ---
+200 | 自动取消成功
+530 | 其它异常
+
+
+- `message`
+
+message | 描述
+--- | ---
+ok  | 自动取消成功
+not | 自动取消失败
