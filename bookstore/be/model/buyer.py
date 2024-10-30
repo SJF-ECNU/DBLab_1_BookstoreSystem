@@ -111,7 +111,7 @@ class Buyer(db_conn.DBConn):
 
             # 检查是否已经付款
             if order.get('is_paid', False):
-                return 400, "Order has already been paid."
+                return error.error_order_is_paid(order_id)
 
             # 计算订单总价
             order_details = self.db.new_order_detail.find({"order_id": order_id})
@@ -150,16 +150,17 @@ class Buyer(db_conn.DBConn):
             user = self.db.user.find_one({"user_id": buyer_id})
             if user is None or user['password'] != password:
                 return error.error_authorization_fail()
-            # 检查是否被取消
-            if order['status'] == "canceled":
-                return 400, "Order has been canceled."
+            # # 检查是否被取消
+            # if order['status'] == "canceled":
+            #     return error.error_order_is_canceled(order_id)
+            
             # 检查是否已经付款
             if not order.get('is_paid', False):
-                return 400, "Order is not paid yet."
+                return error.error_not_be_paid(order_id)
 
             # 检查是否已确认收货
             if order.get('is_received', False):
-                return 400, "Order has already been received."
+                return error.error_order_is_confirmed(order_id)
 
             buyer_id = order['user_id']
             store_id = order['store_id']
