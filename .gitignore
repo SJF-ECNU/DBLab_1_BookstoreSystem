@@ -1,2 +1,4 @@
 local_database.db
 *.pyc
+bookstore/.coverage
+bookstore/.coverage

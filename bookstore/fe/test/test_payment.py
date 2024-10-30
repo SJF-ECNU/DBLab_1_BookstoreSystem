@@ -113,7 +113,7 @@ class TestPayment:
         assert code == 200
         code = self.buyer.payment(self.order_id)
         code = self.seller.ship(self.seller_id, "non_existent_store", self.order_id)
-        assert code == 512
+        assert code == 513
 
     def test_ship_order_non_existent_order(self):
         code= self.buyer.add_funds(self.total_price)
