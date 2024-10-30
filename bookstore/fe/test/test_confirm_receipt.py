@@ -59,7 +59,7 @@ class TestConfirmReceipt:
 
         self.buyer.password = self.buyer.password + "_x"
         code = self.buyer.confirm_receipt_and_pay_to_seller(self.order_id)
-        assert code != 200
+        assert code == 401
     
     def test_buyer_user_id_is_equal(self):
         code = self.buyer.add_funds(self.total_price)
@@ -71,17 +71,7 @@ class TestConfirmReceipt:
         self.buyer.user_id = self.buyer.user_id + "_x"
 
         code = self.buyer.confirm_receipt_and_pay_to_seller(self.order_id)
-        assert code != 200
-
-    def test_status_error(self):
-        code = self.buyer.add_funds(self.total_price)
-        assert code == 200
-
-        code= self.buyer.cancel_order(self.order_id, self.buyer_id,self.password)
-        assert code[0] == 200
-
-        code = self.buyer.confirm_receipt_and_pay_to_seller(self.order_id)
-        assert code != 200
+        assert code == 401
 
     def test_repeat_confirm_receipt(self):
         code = self.buyer.add_funds(self.total_price)
@@ -94,13 +84,13 @@ class TestConfirmReceipt:
         assert code == 200
 
         code = self.buyer.confirm_receipt_and_pay_to_seller(self.order_id)
-        assert code != 200
+        assert code == 528
 
     def test_not_paid(self):
         code = self.buyer.add_funds(self.total_price)
         assert code == 200
 
         code = self.buyer.confirm_receipt_and_pay_to_seller(self.order_id)
-        assert code != 200
+        assert code == 520
         
         

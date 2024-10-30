@@ -74,7 +74,7 @@ order_id | string | 订单号，只有返回200时才有效 | N
 ## 买家付款
 
 #### URL：
-POST http://[address]/buyer/payment
+POST http://[address]/buyer/pay_to_platform
 
 #### Request
 
@@ -103,9 +103,14 @@ Status Code:
 码 | 描述
 --- | ---
 200 | 付款成功
-5XX | 账户余额不足
-5XX | 无效参数
+400 | 已付款
 401 | 授权失败 
+511 | 账户不存在
+518 | 订单不存在
+519 | 账户余额不足
+526 | 订单已被取消
+527 | 订单重复支付
+530 | 无效参数
 
 
 ## 买家充值
@@ -142,3 +147,41 @@ Status Code:
 200 | 充值成功
 401 | 授权失败
 5XX | 无效参数
+
+## 买家确认收货
+
+#### URL：
+POST http://[address]/buyer/confirm_receipt_and_pay_toseller
+
+#### Request
+
+
+
+##### Body:
+```json
+{
+  "user_id": "user_id",
+  "password": "password",
+  "add_value": 10
+}
+```
+
+##### 属性说明：
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+user_id | string | 买家用户ID | N
+password | string | 用户密码 | N
+add_value | int | 充值金额，以分为单位 | N
+
+
+Status Code:
+
+码 | 描述
+--- | ---
+200 | 确认收货成功
+401 | 授权失败
+518 | 订单不存在
+520 | 订单未支付
+528 | 订单已确认收货
+530 | 无效参数

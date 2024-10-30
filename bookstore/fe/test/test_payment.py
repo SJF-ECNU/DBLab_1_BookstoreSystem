@@ -58,13 +58,13 @@ class TestPayment:
         assert code == 200
         self.buyer.password = self.buyer.password + "_x"
         code = self.buyer.payment(self.order_id)
-        assert code != 200
+        assert code == 401
 
     def test_not_suff_funds(self):
         code = self.buyer.add_funds(self.total_price - 1)
         assert code == 200
         code = self.buyer.payment(self.order_id)
-        assert code != 200
+        assert code == 519
 
     def test_repeat_pay(self):
         code = self.buyer.add_funds(self.total_price)
@@ -73,7 +73,7 @@ class TestPayment:
         assert code == 200
 
         code = self.buyer.payment(self.order_id)
-        assert code != 200
+        assert code == 527
 
     def test_order_is_exist(self):
         code = self.buyer.add_funds(self.total_price)
@@ -82,7 +82,7 @@ class TestPayment:
         self.order_id = self.order_id + "_x"
 
         code = self.buyer.payment(self.order_id)
-        assert code != 200
+        assert code == 518
 
     def test_pay_order_id_is_equal(self):
         code = self.buyer.add_funds(self.total_price)
@@ -91,7 +91,7 @@ class TestPayment:
         self.buyer.user_id = self.buyer.user_id + "_x"
         
         code = self.buyer.payment(self.order_id)
-        assert code != 200
+        assert code == 401
 
     def test_ship_order(self):
         code= self.buyer.add_funds(self.total_price)
@@ -106,21 +106,21 @@ class TestPayment:
         assert code == 200
         code = self.buyer.payment(self.order_id)
         code = self.seller.ship("non_existent_user", self.store_id, self.order_id)
-        assert code != (200, "ok")
+        assert code == 511
 
     def test_ship_order_non_existent_store(self):
         code= self.buyer.add_funds(self.total_price)
         assert code == 200
         code = self.buyer.payment(self.order_id)
         code = self.seller.ship(self.seller_id, "non_existent_store", self.order_id)
-        assert code != (200, "ok")
+        assert code == 512
 
     def test_ship_order_non_existent_order(self):
         code= self.buyer.add_funds(self.total_price)
         assert code == 200
         code = self.buyer.payment(self.order_id)
         code = self.seller.ship(self.seller_id, self.store_id, "non_existent_order")
-        assert code != (200, "ok")
+        assert code == 518
 
     def test_repeat_ship_order(self):
         code= self.buyer.add_funds(self.total_price)
@@ -131,8 +131,8 @@ class TestPayment:
         assert code == 200
 
         code = self.seller.ship(self.seller_id, self.store_id, self.order_id)
-        assert code != 200
+        assert code == 529
     
     def test_not_paid_ship(self):
         code = self.seller.ship(self.seller_id, self.store_id, self.order_id)
-        assert code != 200
+        assert code == 520

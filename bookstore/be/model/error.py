@@ -17,9 +17,10 @@ error_code = {
     524: "Store with ID {} not found.",
     525: "Book with ID {} not found in store with ID {}.",
 
-    526: "",
-    527: "",
-    528: "",
+    526: "order is canceled, order id {}",
+    527: "order is paid, order id {}",
+    528: "order is confirmed, order id {}",
+    529: "order is shipped, order id {}",
     530: "Database operation error: {}",
 }
 
@@ -83,6 +84,16 @@ def error_no_store_found(user_id):
 def error_authorization_fail():
     return 401, error_code[401]
 
+def error_order_is_canceled(order_id):
+    return 526, error_code[526]
 
+def error_order_is_paid(order_id):
+    return 527, error_code[527]
+
+def error_order_is_confirmed(order_id):
+    return 528, error_code[528]
+
+def error_order_is_shipped(order_id):
+    return 529, error_code[529]
 def error_and_message(code, message):
     return code, message
