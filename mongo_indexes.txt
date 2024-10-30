@@ -1,0 +1,54 @@
+Collection: books
+  Index Name: _id_
+    Key: SON([('_id', 1)])
+    Unique: False
+    Sparse: False
+    Background: False
+
+  Index Name: text_idx
+    Key: SON([('_fts', 'text'), ('_ftsx', 1)])
+    Unique: False
+    Sparse: False
+    Background: False
+
+
+Collection: store
+  Index Name: _id_
+    Key: SON([('_id', 1)])
+    Unique: False
+    Sparse: False
+    Background: False
+
+
+Collection: user_store
+  Index Name: _id_
+    Key: SON([('_id', 1)])
+    Unique: False
+    Sparse: False
+    Background: False
+
+
+Collection: new_order
+  Index Name: _id_
+    Key: SON([('_id', 1)])
+    Unique: False
+    Sparse: False
+    Background: False
+
+
+Collection: user
+  Index Name: _id_
+    Key: SON([('_id', 1)])
+    Unique: False
+    Sparse: False
+    Background: False
+
+
+Collection: new_order_detail
+  Index Name: _id_
+    Key: SON([('_id', 1)])
+    Unique: False
+    Sparse: False
+    Background: False
+
+

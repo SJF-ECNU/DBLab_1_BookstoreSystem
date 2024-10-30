@@ -1,0 +1,59 @@
+Collection: books
+  _id: ObjectId
+  id: str
+  title: str
+  author: NoneType, str
+  publisher: str
+  original_title: NoneType, str
+  translator: NoneType, str
+  pub_year: str
+  pages: int
+  price: int
+  currency_unit: str
+  binding: str
+  isbn: str
+  author_intro: str
+  book_intro: str
+  content: str
+  tags: str
+  picture: bytes
+
+Collection: store
+  _id: ObjectId
+  store_id: str
+  book_id: str
+  book_info: str
+  stock_level: int
+
+Collection: user_store
+  _id: ObjectId
+  user_id: str
+  store_id: str
+
+Collection: new_order
+  _id: ObjectId
+  order_id: str
+  user_id: str
+  store_id: str
+  is_paid: bool
+  is_shipped: bool
+  is_received: bool
+  order_completed: bool
+  status: str
+  created_time: datetime
+
+Collection: user
+  _id: ObjectId
+  user_id: str
+  password: str
+  balance: int
+  token: str
+  terminal: str
+
+Collection: new_order_detail
+  _id: ObjectId
+  order_id: str
+  book_id: str
+  count: int
+  price: int
+

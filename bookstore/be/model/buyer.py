@@ -150,9 +150,6 @@ class Buyer(db_conn.DBConn):
             user = self.db.user.find_one({"user_id": buyer_id})
             if user is None or user['password'] != password:
                 return error.error_authorization_fail()
-            # # 检查是否被取消
-            # if order['status'] == "canceled":
-            #     return error.error_order_is_canceled(order_id)
             
             # 检查是否已经付款
             if not order.get('is_paid', False):
@@ -189,9 +186,6 @@ class Buyer(db_conn.DBConn):
                 {"order_id": order_id},
                 {"$set": {"order_completed": True}}
             )
-            # 删除订单和订单详情（可选，视业务逻辑而定）
-            # self.db.new_order.delete_one({"order_id": order_id})
-            # self.db.new_order_detail.delete_many({"order_id": order_id})
 
         except Exception as e:# pragma: no cover
             return 530, "{}".format(str(e))
