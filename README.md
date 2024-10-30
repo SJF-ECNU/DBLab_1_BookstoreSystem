@@ -65,3 +65,7 @@ bookstore/fe/data/book.db中包含测试的数据，从豆瓣网抓取的图书�
         tags TEXT,
         picture BLOB
     );
+
+# 项目完成，测试结果如下
+![alt text](test_results_1.png)
+![alt text](test_results_2.png)
