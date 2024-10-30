@@ -302,32 +302,32 @@ class Buyer(db_conn.DBConn):
             # 获取当前时间
             now = datetime.utcnow()
 
-            # 设定超时时间为 2 s
-            timeout_duration = timedelta(seconds=2)
-
             # 查找所有未支付的订单
             pending_orders = self.db.new_order.find({"is_paid": False})
 
             for order in pending_orders:
-                created_time = order["created_time"]
+                    # 确保 order 字典中存在 "created_time" 键
+                    if "created_time" in order:
+                        created_time_dict = order["created_time"]
+                        time_diff = abs(now - created_time_dict)
 
-                # 检查订单是否已经超时
-                if now - created_time > timeout_duration:
-                    # 取消订单
-                    order_id = order["order_id"]
-                    self.db.new_order.update_one(
-                        {"order_id": order_id},
-                        {"$set": {"status": "canceled"}}
-                    )
-                    # 恢复库存
-                    order_details = self.db.new_order_detail.find({"order_id": order_id})
-                    for detail in order_details:
-                        self.db.store.update_one(
-                            {"store_id": order['store_id'], "book_id": detail['book_id']},
-                            {"$inc": {"stock_level": detail['count']}}
-                        )
-        except Exception as e:# pragma: no cover
-            logging.error(f"Error cancelling expired orders: {str(e)}")
+                        # 超时时间为5秒，检查订单是否已经超时
+                        if time_diff < timedelta(seconds=5):
+                            # 取消订单
+                            order_id = order['order_id']
+                            self.db.new_order.update_one(
+                                {"order_id": order_id},
+                                {"$set": {"status": "canceled"}}
+                            )
+                            # 恢复库存
+                            order_details = self.db.new_order_detail.find({"order_id": order_id})
+                            for detail in order_details:
+                                self.db.store.update_one(
+                                    {"store_id": order['store_id'], "book_id": detail['book_id']},
+                                    {"$inc": {"stock_level": detail['count']}})
+        except Exception as e: # pragma: no cover
+            return 530, "not"
+        
         return 200, "ok"
 
 
